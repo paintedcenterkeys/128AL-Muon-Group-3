@@ -1,25 +1,12 @@
-print('Hello World')
-print('Hello I made a change -Sarah')
+INITIAL_HEIGHT = 10 #whatever
+INITIAL_ENERGY = 5 #also, whatever
 
-print('mason test')
+E = INITIAL_ENERGY
+H = INITIAL_ENERGY
+dx = .1
 
-print('Hello')
+#this will go from the intial height to 0, or wherever the detector is
 
-
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-x = np.linspace(0, 10, 1000)
-m = 1
-
-def y(x, m):
-    return x*m
-
-plt.plot(x, y(x, m))
-
-
-print('mason test')
-
-
-
+for whatever:
+	dE = C0 * rho * dx
+	E = E + dE
