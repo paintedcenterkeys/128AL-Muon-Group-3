@@ -1,5 +1,8 @@
 print('Hello World')
 
+print('Hello')
+
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,5 +17,6 @@ plt.plot(x, y(x, m))
 
 
 print('mason test')
+
 
 
