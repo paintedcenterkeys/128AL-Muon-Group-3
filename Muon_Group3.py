@@ -1,5 +1,6 @@
 print('Hello World')
 
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -10,3 +11,8 @@ def y(x, m):
     return x*m
 
 plt.plot(x, y(x, m))
+
+
+print('mason test')
+
+
