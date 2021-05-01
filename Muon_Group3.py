@@ -42,31 +42,54 @@ def get_t_prime(C0,rho,gamma1,gamma2):
     
 
 #Initial Conditions, will be provided from the previous groups as a list for each condition of all the muons
-Beta=.1 #dummy variable amount, v/c
-x0=12000 #height of troposphere
-gamma=1/np.sqrt(1-Beta*Beta) #Lorentz factor
-E=gamma*m*c**2 #double check, not correct
+Beta_initial=[.1,.1] #dummy variable amount, v/c
+x0_initial=[12000,10000] #height of troposphere
+gamma_initial = [] #Lorenz Factor
+for j in range(len(Beta_initial)):
+    gamma_initial.append(1/np.sqrt(1-Beta_initial[j]*Beta_initial[j]))
+E_initial=[] #double check, not correct
+for k in range(len(x0_initial)):
+    E_initial.append(gamma_initial[k]*m*c**2)
+t_prime = 0
 
 deltax=1 #dummy amount, will change
 
-for i,x in enumerate(range(x0,0,-deltax)):
-    C0=get_C0(x,gamma,Beta)
-    rho=get_rho(x)
-    dE=C0*rho*deltax
-    E1 = E
-    E2 = E1 - dE #feel like this should be adding dE but that results in increasing energy
-    gamma1 = gamma
-    #gamma2 = E/(m*c**2)
-    gamma2=E2*gamma1/E1
-    Beta1=Beta
-    Beta2=np.sqrt(1-1/(gamma2*gamma2))
-    t_prime=get_t_prime(C0,rho,gamma1,gamma2)
+Beta_final = []
+E_final = []
+C0_final = []
+rho_final = []
+gamma_final = []
+t_prime_final = []
 
-    gamma = gamma2
-    Beta = Beta2
-    E = E2
-    if x%500==0:
-        print(x,Beta,E,C0,rho,gamma,t_prime,'\n')
+for muon in range(len(x0_initial)):
+    Beta = Beta_initial[muon]
+    x0 = x0_initial[muon]
+    gamma = gamma_initial[muon]
+    E = E_initial[muon]
+    for i,x in enumerate(range(x0,0,-deltax)):
+        C0=get_C0(x,gamma,Beta)
+        rho=get_rho(x)
+        dE=C0*rho*deltax
+        E1 = E
+        E2 = E1 - dE #feel like this should be adding dE but that results in increasing energy
+        gamma1 = gamma
+        gamma2 = E/(m*c**2)
+        #gamma2=E2*gamma1/E1
+        Beta1=Beta
+        Beta2=np.sqrt(1-1/(gamma2*gamma2))
+        t_prime =+ get_t_prime(C0,rho,gamma1,gamma2)
+
+        gamma = gamma2
+        Beta = Beta2
+        E = E2
+        if x%500==0:
+            print(x,Beta,E,C0,rho,gamma,t_prime,'\n')
+    Beta_final.append(Beta)
+    E_final.append(E)
+    C0_final.append(C0)
+    rho_final.append(rho)
+    gamma_final.append(gamma)
+    t_prime_final.append(t_prime)
 
 
 
