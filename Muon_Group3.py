@@ -111,7 +111,7 @@ anglesOfDetectedMuons_roundEarth = []
 
 for muon in range(len(x0_initial)):
     #Check detection for flat Earth
-    if (energyDectected - energyAllowance <= E_flat_final[muon] <= energyDetected + energyAllowance):
+    if (energyDetected - energyAllowance <= E_flat_final[muon] <= energyDetected + energyAllowance):
         #Decide if it decayed
         if (random.random() < findDecayProbability(t_prime_flat_final[muon])):
             anglesOfDetectedMuons_flatEarth.append(zenithAngle_final[muon])
