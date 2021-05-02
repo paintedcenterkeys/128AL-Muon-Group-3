@@ -41,34 +41,64 @@ def alternate_get_t_prime(C0, rho, gamma1, gamma2):
 def get_t_prime(C0,rho,gamma1,gamma2):
     t_prime=m*c/(rho*C0)*(1/np.sqrt(gamma2**2-1)-1/np.sqrt(gamma1**2-1))*(gamma2-gamma1)
     return t_prime
+
+def findDecayProbability(t_prime):
+    """Given the the time it takes for the muon to reach the detector in its own reference frame, returns the probability that it decays. """
+    tau = 2.2*10**-6 #seconds
+    return np.exp(-1*t_prime/tau)
     
 
 #Initial Conditions, will be provided from the previous groups as a list for each condition of all the muons
-Beta_initial=[.1,.1] #dummy variable amount, v/c
-x0_initial=[12000,10000] #height of troposphere
+E_initial = [1e18,1e20]
+x0_flat_initial=[12000,10000] #height of troposphere
+x0_round_initial = [15000,13000]
 gamma_initial = [] #Lorenz Factor
-for j in range(len(Beta_initial)):
-    gamma_initial.append(1/np.sqrt(1-Beta_initial[j]*Beta_initial[j]))
-E_initial=[] #double check, not correct
-for k in range(len(x0_initial)):
-    E_initial.append(gamma_initial[k]*m*c**2)
-t_prime = 0
+for E_value in E_initial:
+    gamma_initial.append(E_value/(m*c**2)) 
+Beta_initial=[] #beta = v/c
+for gamma_value in gamma_initial:
+    Beta_initial.append(np.sqrt(1 - 1/(gamma_value**2)))
+t_prime_flat = 0
+t_prime_round = 0
 
 deltax=1 #dummy amount, will change
 
-Beta_final = []
-E_final = []
-C0_final = []
-rho_final = []
-gamma_final = []
-t_prime_final = []
+E_flat_final = []
+E_round_final = []
+t_prime_flat_final = []
+t_prime_round_final = []
 
-for muon in range(len(x0_initial)):
+#Find final energies and t_prime for flat earth
+for muon in range(len(x0_flat_initial)):
     Beta = Beta_initial[muon]
-    x0 = x0_initial[muon]
+    x0_flat = x0_flat_initial[muon]
     gamma = gamma_initial[muon]
     E = E_initial[muon]
-    for i,x in enumerate(range(x0,0,-deltax)):
+    for i,x in enumerate(range(x0_flat,0,-deltax)):
+        C0=get_C0(x,gamma,Beta)
+        rho=get_rho(x)
+        dE=C0*rho*deltax
+        E1 = E
+        E2 = E1 - dE #feel like this should be adding dE but that results in increasing energy
+        gamma1 = gamma
+        gamma2 = E2/(m*c**2)
+        Beta1=Beta
+        Beta2=np.sqrt(1-1/(gamma2*gamma2))
+        t_prime_flat =+ alternate_get_t_prime(C0,rho,gamma1,gamma2)
+
+        gamma = gamma2
+        Beta = Beta2
+        E = E2
+    E_flat_final.append(E)
+    t_prime_flat_final.append(t_prime_flat)
+
+#Find the final energies and t_prime for found earth
+for muon in range(len(x0_round_initial)):
+    Beta = Beta_initial[muon]
+    x0_round = x0_round_initial[muon]
+    gamma = gamma_initial[muon]
+    E = E_initial[muon]
+    for i,x in enumerate(range(x0_flat,0,-deltax)):
         C0=get_C0(x,gamma,Beta)
         rho=get_rho(x)
         dE=C0*rho*deltax
@@ -76,23 +106,16 @@ for muon in range(len(x0_initial)):
         E2 = E1 - dE #feel like this should be adding dE but that results in increasing energy
         gamma1 = gamma
         gamma2 = E/(m*c**2)
-        #gamma2=E2*gamma1/E1
         Beta1=Beta
         Beta2=np.sqrt(1-1/(gamma2*gamma2))
-        t_prime =+ get_t_prime(C0,rho,gamma1,gamma2)
+        t_prime_round =+ get_t_prime(C0,rho,gamma1,gamma2)
 
         gamma = gamma2
         Beta = Beta2
         E = E2
-        if x%500==0:
-            print(x,Beta,E,C0,rho,gamma,t_prime,'\n')
-    Beta_final.append(Beta)
-    E_final.append(E)
-    C0_final.append(C0)
-    rho_final.append(rho)
-    gamma_final.append(gamma)
-    t_prime_final.append(t_prime)
-
+    E_round_final.append(E)
+    t_prime_round_final.append(t_prime_round)  
+ 
 
 #Simulating how many muons hit the detector:
     #Checks for muons in the proper energy range
@@ -101,17 +124,13 @@ for muon in range(len(x0_initial)):
         
 energyDetected = 160 #Mev
 energyAllowance = 2 #Mev
-tau = 2.2*10**-6 #seconds
-
-def findDecayProbability(t_prime):
-    return np.exp(-1*t_prime/tau)
  
 anglesOfDetectedMuons_flatEarth = []
 anglesOfDetectedMuons_roundEarth = []
 
-for muon in range(len(x0_initial)):
+for muon in range(len(x0_flat_initial)):
     #Check detection for flat Earth
-    if (energyDectected - energyAllowance <= E_flat_final[muon] <= energyDetected + energyAllowance):
+    if (energyDetected - energyAllowance <= E_flat_final[muon] <= energyDetected + energyAllowance):
         #Decide if it decayed
         if (random.random() < findDecayProbability(t_prime_flat_final[muon])):
             anglesOfDetectedMuons_flatEarth.append(zenithAngle_final[muon])
