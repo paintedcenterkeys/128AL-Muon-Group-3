@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import random
 
 #Constants: Not subject to change
 c=3e8 #Speed of light, m/s
@@ -92,4 +94,44 @@ for muon in range(len(x0_initial)):
     t_prime_final.append(t_prime)
 
 
+#Simulating how many muons hit the detector:
+    #Checks for muons in the proper energy range
+    #Makes a probablistic decision whether a paticular muon has decayed
+    #If muon has the proper energy and is found not to decay, add to histogram
+        
+energyDetected = 160 #Mev
+energyAllowance = 2 #Mev
+tau = 2.2*10**-6 #seconds
 
+def findDecayProbability(t_prime):
+    return np.exp(-1*t_prime/tau)
+ 
+anglesOfDetectedMuons_flatEarth = []
+anglesOfDetectedMuons_roundEarth = []
+
+for muon in range(len(x0_initial)):
+    #Check detection for flat Earth
+    if (energyDectected - energyAllowance <= E_flat_final[muon] <= energyDetected + energyAllowance):
+        #Decide if it decayed
+        if (random.random() < findDecayProbability(t_prime_flat_final[muon])):
+            anglesOfDetectedMuons_flatEarth.append(zenithAngle_final[muon])
+        
+    #Check detection for round Earth
+    if (energyDetected - energyAllowance <= E_round_final[muon] <= energyDetected + energyAllowance):
+        #Decide if it decayed
+        if (random.random() < findDecayProbability(t_prime_round_final[muon])):
+            anglesOfDetectedMuons_roundEarth.append(zenithAngle_final[muon])
+        
+bin_number = 20       
+
+plt.hist(anglesOfDetectedMuons_flatEarth, bins = bin_number)
+plt.title('Flat Earth Distribution of Detected Muons as a Function of Zenith Angle')
+plt.xlabel('Zenith Angle (Radians)')
+plt.ylabel('Number of Detected Muons')
+plt.show()
+
+plt.hist(anglesOfDetectedMuons_roundEarth, bins = bin_number)
+plt.title('Round Earth Distribution of Detected Muons as a Function of Zenith Angle')
+plt.xlabel('Zenith Angle (Radians)')
+plt.ylabel('Number of Detected Muons')
+plt.show()
