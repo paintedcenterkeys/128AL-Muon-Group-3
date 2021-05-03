@@ -34,12 +34,12 @@ def get_rho(x):
     return rho
 #Hey group members can yall check which of these get_t_prime functions is right????? - thx
 
-
 # we're just doing riemann sum here, I think. So it should be the value of the integrand, times dgamma
 def get_dt_prime(C0,rho,gamma1,gamma2):
 	dg = gamma1-gamma2
 	dt_prime = (m/(c*rho*C0)) * dg * 1./(np.sqrt(gamma1**2-1))
 	return dt_prime
+
 
 def findDecayProbability(t_prime):
     """Given the the time it takes for the muon to reach the detector in its own reference frame, returns the probability that it decays. """
@@ -48,6 +48,7 @@ def findDecayProbability(t_prime):
     
 
 #Initial Conditions, will be provided from the previous groups as a list for each condition of all the muons
+
 E_initial = np.array([6000,7000], dtype = 'f') #units of MeV 
 x0_flat_initial = np.array([12000,10000], dtype = 'f') #height of troposphere
 x0_round_initial = np.array([15000,13000], dtype = 'f')
@@ -125,13 +126,16 @@ t_prime_round_final = t_prime_round
 print(t_prime_round)
 print(t_prime_flat)
 
+
 #Simulating how many muons hit the detector:
     #Checks for muons in the proper energy range
     #Makes a probablistic decision whether a paticular muon has decayed
     #If muon has the proper energy and is found not to decay, add to histogram
         
 energyDetected = 160 #Mev
+
 energyAllowance = 20 #Mev
+
  
 anglesOfDetectedMuons_flatEarth = []
 anglesOfDetectedMuons_roundEarth = []
