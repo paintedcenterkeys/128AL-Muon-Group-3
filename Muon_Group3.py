@@ -11,46 +11,34 @@ g= 9.807 #m/s^2
 L= .0065 #temperature lapse rate, K/m
 R= 8.31446 #ideal gas constant, J/(mol K)
 M= 0.0289652 #molar mass of dry air, kg/mol
-e = -1.602e-19 #electron charge, e
+e = 1 #electron charge, e
 
 #changes to the constants, I'm overwriting down here in case we want to go bak to the definitions above
-e = 1 #I'm pretty sure that because it's normally atomic number, charge should be in units of e
 m = 105.658 #MeV/c^2
 
 #Constants: Subject to change based on info we get from previous groups
 A=13 #atomic weight of the stopping medium
-Z=7 #atomic number of N
+Z=7.32 #atomic number of N
 I=A*Z #approximation of mean excitation energy of the stopping medium of atoms
 z=1*e #charge of muon relative to electron charge
 
 def get_C0(gamma,Beta):
     """Given the current gamma and beta, returns the updated C0 value
     C0 is defined as the right side of the Bethe formula divided by rho"""
-    C0=0.3071*Z*z*z/(A*Beta*Beta)*(np.log(2*m*10**6*Beta*Beta*gamma*gamma/I)-Beta*Beta)
+    C0=0.00003071*Z*z*z/(A*Beta*Beta)*(np.log(2*m*c**2*10**6*Beta*Beta*gamma*gamma/I)-Beta*Beta)
     return C0
 
 def get_rho(x):
     """Given the height from the ground, returns the mass density, rho of the air at that height."""
-    rho=p0*M/(R*T0)*(1-L*x/T0)**(g*M/(R*L)-1)
+    rho=1000*p0*M/(R*T0)*(1-L*x/T0)**(g*M/(R*L)-1)
     return rho
 #Hey group members can yall check which of these get_t_prime functions is right????? - thx
-
-# def alternate_get_t_prime(C0, rho, gamma1, gamma2):
-#     """Given the updated C0 and rho, the previous gamma, and the updated gamma, returns the updated t_prime
-#     t_prime is the time elapsed in the muon's reference frame"""
-#     t_prime = m*c/(rho*C0)*(gamma1 * (gamma1**2 - 1)**(-3/2) - gamma2 * (gamma2**2 - 1)**(-3/2))
-#     return t_prime
-
-# def get_t_prime(C0,rho,gamma1,gamma2):
-#     t_prime=m*c/(rho*C0)*(1/np.sqrt(gamma2**2-1)-1/np.sqrt(gamma1**2-1))*(gamma2-gamma1)
-#     return t_prime
 
 
 # we're just doing riemann sum here, I think. So it should be the value of the integrand, times dgamma
 def get_dt_prime(C0,rho,gamma1,gamma2):
-	gamma_average = (gamma2+gamma1)/2.
 	dg = gamma1-gamma2
-	dt_prime = (m/(c*rho*C0)) * dg * 1./(np.sqrt(gamma_average**2-1))
+	dt_prime = (m/(c*rho*C0)) * dg * 1./(np.sqrt(gamma1**2-1))
 	return dt_prime
 
 def findDecayProbability(t_prime):
@@ -60,7 +48,7 @@ def findDecayProbability(t_prime):
     
 
 #Initial Conditions, will be provided from the previous groups as a list for each condition of all the muons
-E_initial = np.array([9000,10000], dtype = 'f') #units of MeV 
+E_initial = np.array([6000,7000], dtype = 'f') #units of MeV 
 x0_flat_initial = np.array([12000,10000], dtype = 'f') #height of troposphere
 x0_round_initial = np.array([15000,13000], dtype = 'f')
 
@@ -76,7 +64,7 @@ E_round_final = np.zeros(len(x0_flat_initial))
 t_prime_flat_final = np.zeros(len(x0_round_initial))
 t_prime_round_final = np.zeros(len(x0_round_initial))
 
-number_of_steps = 1000. #dummy amount, will change
+number_of_steps = 5000. #dummy amount, will change
 dx_flat = x0_flat_initial/number_of_steps
 dx_round = x0_round_initial/number_of_steps
 
@@ -101,8 +89,8 @@ for i in range(int(number_of_steps)):
     gamma = gamma2
     Beta = Beta2
     E = E2
-    x += dx_flat
-
+    x -= dx_flat
+    print(E)
 E_flat_final = E
 t_prime_flat_final = t_prime_flat
 
@@ -128,7 +116,7 @@ for i in range(int(number_of_steps)):
     gamma = gamma2
     Beta = Beta2
     E = E2
-    x += dx_round
+    x -= dx_round
 
 E_round_final = E
 t_prime_round_final = t_prime_round
@@ -143,7 +131,7 @@ print(t_prime_flat)
     #If muon has the proper energy and is found not to decay, add to histogram
         
 energyDetected = 160 #Mev
-energyAllowance = 2 #Mev
+energyAllowance = 20 #Mev
  
 anglesOfDetectedMuons_flatEarth = []
 anglesOfDetectedMuons_roundEarth = []
