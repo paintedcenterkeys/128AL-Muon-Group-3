@@ -13,6 +13,10 @@ R= 8.31446 #ideal gas constant, J/(mol K)
 M= 0.0289652 #molar mass of dry air, kg/mol
 e = -1.602e-19 #electron charge, e
 
+#changes to the constants, I'm overwriting down here in case we want to go bak to the definitions above
+e = 1 #I'm pretty sure that because it's normally atomic number, charge should be in units of e
+m = 105.658 #MeV/c^2
+
 #Constants: Subject to change based on info we get from previous groups
 A=13 #atomic weight of the stopping medium
 Z=7 #atomic number of N
@@ -22,14 +26,13 @@ z=1*e #charge of muon relative to electron charge
 def get_C0(gamma,Beta):
     """Given the current gamma and beta, returns the updated C0 value
     C0 is defined as the right side of the Bethe formula divided by rho"""
-    C0=0.3071*Z*z*z/(A*Beta*Beta)*(np.log(2*m*c*c*Beta*Beta*gamma*gamma/I)-Beta*Beta)
+    C0=0.3071*Z*z*z/(A*Beta*Beta)*(np.log(2*m*10**6*Beta*Beta*gamma*gamma/I)-Beta*Beta)
     return C0
 
 def get_rho(x):
-    """Given the height from the ground, returns the mass dencity, rho of the air at that height."""
+    """Given the height from the ground, returns the mass density, rho of the air at that height."""
     rho=p0*M/(R*T0)*(1-L*x/T0)**(g*M/(R*L)-1)
     return rho
-
 #Hey group members can yall check which of these get_t_prime functions is right????? - thx
 
 # def alternate_get_t_prime(C0, rho, gamma1, gamma2):
@@ -43,12 +46,11 @@ def get_rho(x):
 #     return t_prime
 
 
-# we're just doing riemann sum here, I think. So it should be the value of the expression, times dgamma
+# we're just doing riemann sum here, I think. So it should be the value of the integrand, times dgamma
 def get_dt_prime(C0,rho,gamma1,gamma2):
 	gamma_average = (gamma2+gamma1)/2.
 	dg = gamma1-gamma2
-	print(C0)
-	dt_prime = (m*c/(rho*C0)) * dg * 1./(np.sqrt(gamma_average**2-1))
+	dt_prime = (m/(c*rho*C0)) * dg * 1./(np.sqrt(gamma_average**2-1))
 	return dt_prime
 
 def findDecayProbability(t_prime):
@@ -58,14 +60,11 @@ def findDecayProbability(t_prime):
     
 
 #Initial Conditions, will be provided from the previous groups as a list for each condition of all the muons
-E_initial = np.array([1e18,1e20], dtype = 'f')
+E_initial = np.array([9000,10000], dtype = 'f') #units of MeV 
 x0_flat_initial = np.array([12000,10000], dtype = 'f') #height of troposphere
 x0_round_initial = np.array([15000,13000], dtype = 'f')
 
-#instead of appending, it makes the list of intial gammas by using numpy. A litte faster - mason
-gamma_initial = E_initial/(m*c**2)
-
-#same thing here
+gamma_initial = E_initial/(m)
 Beta_initial = np.sqrt(1-1/(gamma_initial**2))
 
 t_prime_flat = 0
@@ -94,7 +93,7 @@ for i in range(int(number_of_steps)):
     E1 = E
     E2 = E1 - dE #feel like this should be adding dE but that results in increasing energy
     gamma1 = gamma
-    gamma2 = E2/(m*c**2)
+    gamma2 = E2/m
     Beta1=Beta
     Beta2=np.sqrt(1-1/(gamma2*gamma2))
     t_prime_flat += get_dt_prime(C0,rho,gamma1,gamma2)
@@ -121,7 +120,7 @@ for i in range(int(number_of_steps)):
     E1 = E
     E2 = E1 - dE #feel like this should be adding dE but that results in increasing energy
     gamma1 = gamma
-    gamma2 = E2/(m*c**2)
+    gamma2 = E2/m
     Beta1=Beta
     Beta2=np.sqrt(1-1/(gamma2*gamma2))
     t_prime_round += get_dt_prime(C0,rho,gamma1,gamma2)
